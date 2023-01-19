@@ -20,28 +20,49 @@ public class TNTRemoteItem extends Item {
         super(settings);
     }
 
+    @Override
+    public  TypedActionResult<ItemStack> use (World world, PlayerEntity player, Hand hand){
 
-    private boolean mode = true;
-
-    private boolean remoteMode(PlayerEntity user, Hand hand){
-        if((hand == Hand.MAIN_HAND) && Screen.hasShiftDown() && mode){
-            mode = false;
-            user.sendMessage(Text.literal("Detonate Mode").formatted(Formatting.RED));
-        } else if ((hand == Hand.MAIN_HAND) && Screen.hasShiftDown() && !mode) {
-            mode = true;
-            user.sendMessage(Text.literal("Prime Mode").formatted(Formatting.DARK_GREEN));
+        if(Screen.hasShiftDown()) {
+            remoteMode(player, hand);
+        } else {
+            //Item use function
         }
-        return mode;
+
+        return super.use(world, player, hand);
     }
 
-    //Item Functions
+    private boolean Mode = true;
+
+    private void remoteMode(PlayerEntity player, Hand hand){
+        if((hand == Hand.MAIN_HAND) && Screen.hasShiftDown() && Mode){
+            Mode = false;
+            player.sendMessage(Text.literal("Detonate Mode").formatted(Formatting.RED));
+        } else if ((hand == Hand.MAIN_HAND) && Screen.hasShiftDown() && !Mode) {
+            Mode = true;
+            player.sendMessage(Text.literal("Prime Mode").formatted(Formatting.DARK_GREEN));
+        }
+    }
+
+    private void remoteUse(PlayerEntity player, Hand hand, ){
+        //use item
+    }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if(Screen.hasShiftDown()) {
-            tooltip.add(Text.literal("Right Click on TNT to prime it (max 16).").formatted(Formatting.AQUA));
+
+        if(Mode){
+            if(Screen.hasShiftDown()) {
+                tooltip.add(Text.literal("Right Click on TNT to prime it (max 16).").formatted(Formatting.AQUA));
+            } else {
+                tooltip.add(Text.literal("Prime mode.Press Shift for more info!").formatted(Formatting.YELLOW));
+            }
         } else {
-            tooltip.add(Text.literal("Press Shift for more info!").formatted(Formatting.YELLOW));
+            if(Screen.hasShiftDown()) {
+                tooltip.add(Text.literal("Right Click to detonate all primed TNT.").formatted(Formatting.AQUA));
+            } else {
+                tooltip.add(Text.literal("Detonate mode.Press Shift for more info!").formatted(Formatting.YELLOW));
+            }
         }
 
         super.appendTooltip(stack, world, tooltip, context);
